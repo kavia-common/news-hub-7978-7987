@@ -1,82 +1,61 @@
-# Lightweight React Template for KAVIA
+# News Hub — Ocean Professional (React)
 
-This project provides a minimal React template with a clean, modern UI and minimal dependencies.
+A bold, dark-themed news aggregator frontend built with React. It integrates with NewsAPI.org to provide:
+- Top headlines
+- Category filtering
+- Keyword search
+- Bookmarking (localStorage)
+- Social sharing
+- No authentication required
 
-## Features
+## Quick start
 
-- **Lightweight**: No heavy UI frameworks - uses only vanilla CSS and React
-- **Modern UI**: Clean, responsive design with KAVIA brand styling
-- **Fast**: Minimal dependencies for quick loading times
-- **Simple**: Easy to understand and modify
-
-## Getting Started
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-### `npm test`
-
-Launches the test runner in interactive watch mode.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-## Customization
-
-### Colors
-
-The main brand colors are defined as CSS variables in `src/App.css`:
-
-```css
-:root {
-  --kavia-orange: #E87A41;
-  --kavia-dark: #1A1A1A;
-  --text-color: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
-}
+1) Install dependencies:
+```
+npm install
 ```
 
-### Components
+2) Configure environment:
+- Copy `.env.example` to `.env` and set your NewsAPI key:
+```
+cp .env.example .env
+# edit .env to set REACT_APP_NEWS_API_KEY
+```
 
-This template uses pure HTML/CSS components instead of a UI framework. You can find component styles in `src/App.css`. 
+3) Run the development server:
+```
+npm start
+```
 
-Common components include:
-- Buttons (`.btn`, `.btn-large`)
-- Container (`.container`)
-- Navigation (`.navbar`)
-- Typography (`.title`, `.subtitle`, `.description`)
+4) Open the app at http://localhost:3000
 
-## Learn More
+## Environment variables
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `REACT_APP_NEWS_API_KEY` (required): Your NewsAPI.org API key.
+- `REACT_APP_NEWS_API_BASE_URL` (optional): Defaults to `https://newsapi.org/v2`.
+- `REACT_APP_SITE_URL` (optional): Used in footer links for social sharing.
 
-### Code Splitting
+Note: NewsAPI free plan may block CORS on browser requests. If you encounter CORS errors,
+you can use a simple development proxy (e.g., set up a small server) or enable a CORS proxy.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Features and usage
 
-### Analyzing the Bundle Size
+- Header: brand, search bar, and Bookmarks button.
+- Sidebar: category filters (general, business, entertainment, health, science, sports, technology).
+- Main: article cards with Read, Bookmark, and Share actions.
+- Footer: quick social links.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Bookmarks are stored in browser localStorage and never leave your device.
 
-### Making a Progressive Web App
+## Styling
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+The UI follows the "Ocean Professional" bold theme:
+- Dark background with high contrast surfaces.
+- Primary (Orange #F97316) and Secondary (Green #10B981) accents.
+- Strong typography and rounded corners.
 
-### Advanced Configuration
+All theme styles are defined in `src/theme.css`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## License
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project uses NewsAPI.org. Review their terms for usage restrictions.
