@@ -1,9 +1,10 @@
 /**
- * GNews integration (no signup required using the public "demo" key).
+ * GNews integration using a default API key (overridable via ENV).
  * Docs: https://gnews.io/docs/v4
  *
- * We default to the demo key for zero-config use. Users can override with REACT_APP_GNEWS_API_KEY
- * and REACT_APP_GNEWS_API_BASE_URL if desired.
+ * Default behavior:
+ * - Uses provided default key for zero-config use.
+ * - You can override with REACT_APP_GNEWS_API_KEY and REACT_APP_GNEWS_API_BASE_URL if desired.
  *
  * GNews article fields differ from NewsAPI; we normalize to:
  * - title
@@ -16,7 +17,8 @@
  */
 
 const BASE_URL = process.env.REACT_APP_GNEWS_API_BASE_URL || 'https://gnews.io/api/v4';
-const API_KEY = process.env.REACT_APP_GNEWS_API_KEY || 'demo';
+// Default to provided key unless REACT_APP_GNEWS_API_KEY is set
+const API_KEY = process.env.REACT_APP_GNEWS_API_KEY || '25e269348ded27d9bf00f28bfca0445a';
 
 // Map our page/pageSize to GNews: uses page and max (1..100)
 function buildQuery(params = {}) {
