@@ -1,0 +1,4 @@
+{
+    "command": "npm run test",
+    "working_directory": "/home/kavia/workspace/code-generation/news-hub-7978-7987/news_aggregator_frontend"
+}
