@@ -1,12 +1,12 @@
 # News Hub — Ocean Professional (React)
 
-A bold, dark-themed news aggregator frontend built with React. It integrates with NewsAPI.org to provide:
+A bold, dark-themed news aggregator frontend built with React. It integrates with a free public news API to provide:
 - Top headlines
 - Category filtering
 - Keyword search
 - Bookmarking (localStorage)
 - Social sharing
-- No authentication required
+- No authentication required (works out of the box)
 
 ## Quick start
 
@@ -15,28 +15,28 @@ A bold, dark-themed news aggregator frontend built with React. It integrates wit
 npm install
 ```
 
-2) Configure environment:
-- Copy `.env.example` to `.env` and set your NewsAPI key:
-```
-cp .env.example .env
-# edit .env to set REACT_APP_NEWS_API_KEY
-```
-
-3) Run the development server:
+2) Run the development server:
 ```
 npm start
 ```
 
-4) Open the app at http://localhost:3000
+3) Open the app at http://localhost:3000
 
-## Environment variables
+No configuration or API key needed for basic usage. The app uses the public GNews demo key by default.
 
-- `REACT_APP_NEWS_API_KEY` (required): Your NewsAPI.org API key.
-- `REACT_APP_NEWS_API_BASE_URL` (optional): Defaults to `https://newsapi.org/v2`.
+## Environment variables (optional)
+
+You can optionally provide your own GNews API key for higher limits:
+- `REACT_APP_GNEWS_API_KEY` (optional): Your GNews API key. Defaults to `demo`.
+- `REACT_APP_GNEWS_API_BASE_URL` (optional): Defaults to `https://gnews.io/api/v4`.
 - `REACT_APP_SITE_URL` (optional): Used in footer links for social sharing.
 
-Note: NewsAPI free plan may block CORS on browser requests. If you encounter CORS errors,
-you can use a simple development proxy (e.g., set up a small server) or enable a CORS proxy.
+## API notes
+
+- Default backend: GNews (https://gnews.io/docs/v4) using the public `demo` key for zero-configuration.
+- Endpoints used: `/top-headlines` for headlines and categories, `/search` for keyword search.
+- Categories supported: general, world, nation, business, technology, entertainment, sports, science, health.
+- The public demo key is intended for testing and has rate/feature limits. For production-grade usage, set `REACT_APP_GNEWS_API_KEY` in a `.env` file.
 
 ## Features and usage
 
@@ -58,4 +58,4 @@ All theme styles are defined in `src/theme.css`.
 
 ## License
 
-This project uses NewsAPI.org. Review their terms for usage restrictions.
+Please review GNews usage terms and limits. This project uses their public endpoints for demonstration purposes.

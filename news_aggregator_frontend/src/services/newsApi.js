@@ -1,19 +1,24 @@
-const BASE_URL = process.env.REACT_APP_NEWS_API_BASE_URL || 'https://newsapi.org/v2';
-const API_KEY = process.env.REACT_APP_NEWS_API_KEY;
-
 /**
- * Simple wrapper for NewsAPI requests.
- * Note: On free plans, NewsAPI may block requests from the browser due to CORS.
- * This app attempts direct calls. If blocked, instruct using a simple proxy/dev setup.
+ * GNews integration (no signup required using the public "demo" key).
+ * Docs: https://gnews.io/docs/v4
+ *
+ * We default to the demo key for zero-config use. Users can override with REACT_APP_GNEWS_API_KEY
+ * and REACT_APP_GNEWS_API_BASE_URL if desired.
+ *
+ * GNews article fields differ from NewsAPI; we normalize to:
+ * - title
+ * - description
+ * - url
+ * - urlToImage
+ * - source: { name }
+ * - author (GNews returns 'source.name' and may not include author; we'll set author to null)
+ * - publishedAt
  */
 
-const headers = () => ({
-  'X-Api-Key': API_KEY || '',
-});
+const BASE_URL = process.env.REACT_APP_GNEWS_API_BASE_URL || 'https://gnews.io/api/v4';
+const API_KEY = process.env.REACT_APP_GNEWS_API_KEY || 'demo';
 
-/**
- * Build query string from an object of params.
- */
+// Map our page/pageSize to GNews: uses page and max (1..100)
 function buildQuery(params = {}) {
   const qs = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
@@ -21,52 +26,89 @@ function buildQuery(params = {}) {
       qs.set(k, v);
     }
   });
+  // Always include API key
+  qs.set('apikey', API_KEY);
   return qs.toString();
 }
 
-/**
- * Fetch with error handling
- */
 async function doFetch(path, params = {}) {
-  if (!API_KEY) {
-    throw new Error('Missing News API key. Please set REACT_APP_NEWS_API_KEY in your .env file.');
-  }
   const query = buildQuery(params);
-  const url = `${BASE_URL}${path}${query ? `?${query}` : ''}`;
+  const url = `${BASE_URL}${path}?${query}`;
 
-  const res = await fetch(url, { headers: headers() });
+  const res = await fetch(url);
   if (!res.ok) {
-    // Attempt to parse error payload
     let msg = `Request failed with status ${res.status}`;
     try {
       const data = await res.json();
-      if (data && data.message) msg = `${msg}: ${data.message}`;
+      if (data && (data.message || data.errors)) {
+        const details = data.message || (Array.isArray(data.errors) ? data.errors.join(', ') : '');
+        msg = `${msg}: ${details}`;
+      }
     } catch {
       // ignore
     }
     throw new Error(msg);
   }
   const data = await res.json();
-  if (data.status !== 'ok') {
-    throw new Error(data.message || 'Unknown error from NewsAPI');
+
+  // GNews returns { totalArticles, articles: [...] }
+  if (!data || !Array.isArray(data.articles)) {
+    throw new Error('Unexpected response from news service');
   }
   return data;
 }
 
-// PUBLIC_INTERFACE
-export async function fetchTopHeadlines({ country = 'us', category, page = 1, pageSize = 20 } = {}) {
-  /** Fetches top headlines with optional category filter. */
-  return doFetch('/top-headlines', { country, category, page, pageSize });
+// Normalize GNews article to our app shape
+function normalizeArticle(a) {
+  return {
+    title: a.title,
+    description: a.description,
+    url: a.url,
+    urlToImage: a.image || null,
+    source: { name: a.source?.name || 'Unknown' },
+    author: null,
+    publishedAt: a.publishedAt,
+  };
 }
 
 // PUBLIC_INTERFACE
-export async function searchEverything({ q, language = 'en', sortBy = 'publishedAt', page = 1, pageSize = 20 } = {}) {
-  /** Searches articles by keyword across many sources. */
-  return doFetch('/everything', { q, language, sortBy, page, pageSize });
+export async function fetchTopHeadlines({ category, page = 1, pageSize = 20, language = 'en' } = {}) {
+  /**
+   * Fetch top headlines via GNews.
+   * GNews supports categories: general, world, nation, business, technology, entertainment, sports, science, health
+   * We pass category when provided; otherwise it'll return top headlines.
+   */
+  const max = Math.min(Math.max(pageSize || 20, 1), 100);
+  const data = await doFetch('/top-headlines', {
+    category,
+    lang: language,
+    page,
+    max,
+  });
+  return {
+    totalResults: data.totalArticles || 0,
+    articles: data.articles.map(normalizeArticle),
+  };
 }
 
 // PUBLIC_INTERFACE
-export async function fetchCategory(category, { country = 'us', page = 1, pageSize = 20 } = {}) {
-  /** Convenience method to fetch top headlines by a specific category. */
-  return fetchTopHeadlines({ country, category, page, pageSize });
+export async function searchEverything({ q, language = 'en', page = 1, pageSize = 20 } = {}) {
+  /** Keyword search across sources. */
+  const max = Math.min(Math.max(pageSize || 20, 1), 100);
+  const data = await doFetch('/search', {
+    q,
+    lang: language,
+    page,
+    max,
+  });
+  return {
+    totalResults: data.totalArticles || 0,
+    articles: data.articles.map(normalizeArticle),
+  };
+}
+
+// PUBLIC_INTERFACE
+export async function fetchCategory(category, { page = 1, pageSize = 20, language = 'en' } = {}) {
+  /** Convenience wrapper using top-headlines with category. */
+  return fetchTopHeadlines({ category, page, pageSize, language });
 }
